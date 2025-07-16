@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +7,6 @@ import { getFeaturedProperties } from "@/data/properties";
 import { Search, Home as HomeIcon, Shield, Clock, Star, Users, TrendingUp, Award } from "lucide-react";
 
 const Home = () => {
-  const [favorites, setFavorites] = useState<string[]>([]);
   const featuredProperties = getFeaturedProperties();
 
   const handleSearch = (filters: SearchFilters) => {
@@ -20,11 +18,6 @@ const Home = () => {
     window.location.href = `/properties?${params.toString()}`;
   };
 
-  const toggleFavorite = (id: string) => {
-    setFavorites(prev => 
-      prev.includes(id) ? prev.filter(fav => fav !== id) : [...prev, id]
-    );
-  };
 
   const features = [
     {
@@ -57,7 +50,7 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen animate-fade-in">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-20 lg:py-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -108,13 +101,14 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {featuredProperties.map((property) => (
-              <PropertyCard
+            {featuredProperties.map((property, index) => (
+              <div
                 key={property.id}
-                property={property}
-                onFavorite={toggleFavorite}
-                isFavorite={favorites.includes(property.id)}
-              />
+                className="animate-fade-in-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <PropertyCard property={property} />
+              </div>
             ))}
           </div>
 

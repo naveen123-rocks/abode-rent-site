@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MapPin, Bed, Bath, Square, Star } from "lucide-react";
+import { useFavorites } from "@/contexts/FavoritesContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface Property {
   id: string;
@@ -22,21 +24,30 @@ export interface Property {
 
 interface PropertyCardProps {
   property: Property;
-  onFavorite?: (id: string) => void;
-  isFavorite?: boolean;
 }
 
-const PropertyCard = ({ property, onFavorite, isFavorite = false }: PropertyCardProps) => {
+const PropertyCard = ({ property }: PropertyCardProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-
+  const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
+  const { isAuthenticated } = useAuth();
+  
   const handleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onFavorite?.(property.id);
+    
+    if (!isAuthenticated) {
+      return;
+    }
+    
+    if (isFavorite(property.id)) {
+      removeFromFavorites(property.id);
+    } else {
+      addToFavorites(property.id);
+    }
   };
 
   return (
-    <Card className="group overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] animate-fade-in">
       <Link to={`/property/${property.id}`}>
         <div className="relative">
           {/* Image */}
@@ -59,17 +70,20 @@ const PropertyCard = ({ property, onFavorite, isFavorite = false }: PropertyCard
           <Button
             variant="ghost"
             size="icon"
-            className={`absolute top-2 right-2 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background ${
-              isFavorite ? "text-red-500" : "text-muted-foreground"
+            className={`absolute top-2 right-2 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-all duration-200 ${
+              isAuthenticated && isFavorite(property.id) ? "text-destructive" : "text-muted-foreground hover:text-destructive"
             }`}
             onClick={handleFavorite}
+            disabled={!isAuthenticated}
           >
-            <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
+            <Heart className={`h-4 w-4 transition-colors duration-200 ${
+              isAuthenticated && isFavorite(property.id) ? "fill-current" : ""
+            }`} />
           </Button>
 
           {/* Featured Badge */}
           {property.featured && (
-            <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground">
+            <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground animate-pulse">
               Featured
             </Badge>
           )}

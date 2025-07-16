@@ -11,7 +11,6 @@ import { SlidersHorizontal, Grid, List, MapPin } from "lucide-react";
 const Properties = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [properties, setProperties] = useState(mockProperties);
-  const [favorites, setFavorites] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('featured');
   const [showFilters, setShowFilters] = useState(false);
@@ -59,11 +58,6 @@ const Properties = () => {
     setSearchParams(params);
   };
 
-  const toggleFavorite = (id: string) => {
-    setFavorites(prev => 
-      prev.includes(id) ? prev.filter(fav => fav !== id) : [...prev, id]
-    );
-  };
 
   const clearFilters = () => {
     const emptyFilters = { location: '', priceRange: '', bedrooms: '', propertyType: '' };
@@ -74,7 +68,7 @@ const Properties = () => {
   const hasActiveFilters = Object.values(filters).some(value => value !== '');
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background animate-fade-in">
       {/* Header */}
       <div className="bg-muted/30 border-b border-border">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -199,13 +193,14 @@ const Properties = () => {
               ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
               : 'space-y-6'
           }>
-            {properties.map((property) => (
-              <PropertyCard
+            {properties.map((property, index) => (
+              <div
                 key={property.id}
-                property={property}
-                onFavorite={toggleFavorite}
-                isFavorite={favorites.includes(property.id)}
-              />
+                className="animate-fade-in-up"
+                style={{ animationDelay: `${index * 0.05}s` }}
+              >
+                <PropertyCard property={property} />
+              </div>
             ))}
           </div>
         )}
